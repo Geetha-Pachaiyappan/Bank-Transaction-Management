@@ -21,7 +21,7 @@ public class Main {
                     customer.insertCustomer();
                 }
                 case 2 -> {
-                    Menus.transactionMenu();
+                    Menus.transactionMenu();  // Transaction Menus
                     transactionInput = sc.nextInt();
                     if(transactionInput == 1){
                         System.out.println("Check Balance");
