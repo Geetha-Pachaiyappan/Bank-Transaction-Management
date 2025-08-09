@@ -1,11 +1,12 @@
 import bank.Customer;
+import bank.ExceptionHandling.InvalidAadharException;
 import bank.Menus;
 import bank.Transaction;
 
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 
         Scanner sc = new Scanner(System.in);
         int input = 0;
