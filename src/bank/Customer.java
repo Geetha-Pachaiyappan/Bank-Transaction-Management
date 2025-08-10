@@ -2,6 +2,7 @@ package bank;
 
 import bank.ExceptionHandling.InvalidAadharException;
 import bank.ExceptionHandling.InvalidPhoneNumberException;
+import bank.ExceptionHandling.UsernameNotValidException;
 
 import java.sql.*;
 import java.util.Scanner;
@@ -11,7 +12,7 @@ public class Customer {
     private int id;
     private long accountNo;
     private String name;
-    private String aadharNo;
+    private long aadharNo;
     private long phoneNo;
     private int age;
     private double balance;
@@ -42,11 +43,11 @@ public class Customer {
         this.name = name;
     }
 
-    public String getAadharNo() {
+    public long getAadharNo() {
         return aadharNo;
     }
 
-    public void setAadharNo(String aadharNo) {
+    public void setAadharNo(long aadharNo) {
         this.aadharNo = aadharNo;
     }
 
@@ -80,7 +81,7 @@ public class Customer {
        this.age = 0;
        this.name = "";
        this.phoneNo = 0;
-       this.aadharNo = null;
+       this.aadharNo = 0;
        this.balance =0;
     }
 
@@ -197,23 +198,38 @@ public class Customer {
 
 
     public void insertCustomer() throws Exception{
+        //Get Username
         System.out.println("Enter Account Holder Name: ");
         this.name = sc.nextLine();
-        System.out.println("Enter Account Holder Aadhar No(563456xxxxxx): ");
-        this.aadharNo = sc.nextLine();
-        if(this.aadharNo.isEmpty() || this.aadharNo.contains(" ") ||
-                !this.aadharNo.matches("\\d{12}")){
-            throw new InvalidAadharException("Invalid Aadhar Number! Please Check");
+        Validations.isUsernameValid(this.name);   // Validation
+
+        //Get Aadhar No
+        try{
+            System.out.println("Enter Account Holder Aadhar No(563456xxxxxx): ");
+            this.aadharNo = sc.nextLong();
+        } catch (Exception e) {
+            throw new InvalidAadharException("Invalid Aadhar Number");
         }
-        System.out.println("Enter phone no: ");
-        this.phoneNo = sc.nextLong();
+        String aadhar = Long.toString(this.aadharNo);
+        Validations.isAadharValid(aadhar);    // -- Validation
+
+        //Get Phone Number
+        try{
+            System.out.println("Enter phone no: ");
+            this.phoneNo = sc.nextLong();
+        }catch (Exception e){
+           throw new InvalidPhoneNumberException("Invalid Phone Number");
+        }
         String strPhoneNumber = Long.toString(phoneNo);
-        if(this.phoneNo == 0 ||
-                !strPhoneNumber.matches("\\d{10}")){
-            throw new InvalidPhoneNumberException("Invalid Phone Number! Please Check");
-        }
+        Validations.isPhoneNumberValid(strPhoneNumber);  // Validation
+
+
+        //Get Account Holder Age
         System.out.println("Enter Account Holder Age: ");
         this.age = sc.nextInt();
+        Validations.isUserAgeValid(this.age);
+
+        //Set Initial Balance = 1000
         this.balance = 1000;
 
         String query = "insert into customer values(?,?,?,?,?,?,?)";
@@ -235,7 +251,7 @@ public class Customer {
             pst.setInt(1,id);
             pst.setLong(2, tempAccountNo);
             pst.setString(3, name);
-            pst.setLong(4,Long.getLong(aadharNo));
+            pst.setLong(4,aadharNo);
             pst.setLong(5,phoneNo);
             pst.setInt(6,age);
             pst.setDouble(7,balance);
